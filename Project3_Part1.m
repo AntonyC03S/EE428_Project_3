@@ -3,6 +3,7 @@ clear;
 RGB_Go_Board = imread('Images/Go_Board.png');
 Gray_Go_Board  = im2gray(RGB_Go_Board);
 
+% Create White and Black Piece Template
 x= 225;
 y= 65;
 Gray_White_Piece = Gray_Go_Board(y-8:y+8,x-14:x+12);
@@ -10,10 +11,13 @@ Gray_White_Piece = Gray_Go_Board(y-8:y+8,x-14:x+12);
 x= 178;
 y= 145;
 Gray_Black_Piece = Gray_Go_Board(y-15:y+15,x-18:x+18);
+
+
+% Find Black Pieces 
 A = normxcorr2(Gray_Black_Piece,Gray_Go_Board);
 
 
-
+% Change Black Pieces to Gray
 threshold = 50;
 mask = Gray_Go_Board(:,:,1) < threshold;
 newRgbImage = Gray_Go_Board;
@@ -22,6 +26,7 @@ R(mask) = 150;
 finalImage = cat(3, R);
 Gray_Go_Board = finalImage;
 
+% Change White Pieces to Black
 threshold = 220;
 mask = Gray_Go_Board(:,:,1) > threshold;
 newRgbImage = Gray_Go_Board;
@@ -30,9 +35,10 @@ R(mask) = 0;
 finalImage = cat(3, R);
 Gray_Go_Board = finalImage;
 
+% Find White Pieces using Black template since they are now black
 B = normxcorr2(Gray_Black_Piece,Gray_Go_Board);
 
-
+%
 tiledlayout(2, 3, 'TileSpacing', 'compact', 'Padding', 'compact');
 nexttile;
 imshow(Gray_Go_Board)
@@ -46,6 +52,7 @@ nexttile;
 imshow(B>0.55)
 nexttile;
 
+% Find White Pieces and put a square around them
 B = (B>0.59);
 stats = regionprops(B, 'Centroid');
 centroids = cat(1, stats.Centroid);
@@ -59,6 +66,7 @@ labels = "White";
 outputImage = insertText(outputImage, pos, labels, ...
     'FontSize', 14, 'BoxColor', 'red', 'TextColor', 'white', 'BoxOpacity', 0.6);
 
+% Find Black Pieces and put a square around them
 A = (A>0.55);
 stats = regionprops(A, 'Centroid');
 centroids = cat(1, stats.Centroid);
@@ -72,6 +80,5 @@ labels = "Black";
 outputImage = insertText(outputImage, pos, labels, ...
     'FontSize', 10, 'BoxColor', 'green', 'TextColor', 'black', 'BoxOpacity', 0.6);
 
-imshow(outputImage);
 figure
 imshow(outputImage);
